@@ -114,7 +114,12 @@ internal sealed class GdsConnection
 			{
 				using (var combinedCts = CancellationTokenSource.CreateLinkedTokenSource(timeoutCts.Token, cancellationToken))
 				{
-					await socket.ConnectAsync(endPoint, combinedCts.Token).ConfigureAwait(false);
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+					static Func<IPEndPoint, CancellationToken, Task> ConnectAsyncHelper(Socket socket) => (e, ct) => Task.Factory.FromAsync(socket.BeginConnect, socket.EndConnect, e, null);
+#else
+					static Func<IPEndPoint, CancellationToken, Task> ConnectAsyncHelper(Socket socket) => (e, ct) => SocketTaskExtensions.ConnectAsync(socket, e, ct).AsTask();
+#endif
+					await ConnectAsyncHelper(socket)(endPoint, combinedCts.Token).ConfigureAwait(false);
 				}
 			}
 
@@ -361,7 +366,11 @@ internal sealed class GdsConnection
 	{
 		if (_networkStream != null)
 		{
+#if NET48 || NETSTANDARD2_0
 			_networkStream.Dispose();
+#else
+			_networkStream.Dispose();
+#endif
 			_networkStream = null;
 		}
 	}
@@ -369,7 +378,12 @@ internal sealed class GdsConnection
 	{
 		if (_networkStream != null)
 		{
+#if NET48 || NETSTANDARD2_0
+			_networkStream.Dispose();
+			await ValueTask2.CompletedTask.ConfigureAwait(false);
+#else
 			await _networkStream.DisposeAsync().ConfigureAwait(false);
+#endif
 			_networkStream = null;
 		}
 	}

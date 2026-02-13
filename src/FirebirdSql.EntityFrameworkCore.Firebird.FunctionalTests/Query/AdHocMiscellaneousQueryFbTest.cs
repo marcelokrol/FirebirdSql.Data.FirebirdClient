@@ -19,25 +19,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Helpers;
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using FirebirdSql.EntityFrameworkCore.Firebird.Infrastructure;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class AdHocMiscellaneousQueryFbTest(NonSharedFixture fixture) : AdHocMiscellaneousQueryRelationalTestBase(fixture)
+public class AdHocMiscellaneousQueryFbTest : AdHocMiscellaneousQueryRelationalTestBase
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
-
-	protected override DbContextOptionsBuilder SetParameterizedCollectionMode(DbContextOptionsBuilder optionsBuilder,
-		ParameterTranslationMode parameterizedCollectionMode)
-	{
-		new FbDbContextOptionsBuilder(optionsBuilder).UseParameterizedCollectionMode(parameterizedCollectionMode);
-		return optionsBuilder;
-	}
 
 	[DoesNotHaveTheDataTheory]
 	[MemberData(nameof(IsAsyncData))]
@@ -85,13 +76,6 @@ public class AdHocMiscellaneousQueryFbTest(NonSharedFixture fixture) : AdHocMisc
 	public override Task Operators_combine_nullability_of_entity_shapers()
 	{
 		return base.Operators_combine_nullability_of_entity_shapers();
-	}
-
-	[NotSupportedByProviderTheory]
-	[MemberData(nameof(InlinedRedactingData))]
-	public override Task Check_inlined_constants_redacting(bool async, bool enableSensitiveDataLogging)
-	{
-		return base.Check_inlined_constants_redacting(async, enableSensitiveDataLogging);
 	}
 
 	protected override async Task Seed2951(Context2951 context)

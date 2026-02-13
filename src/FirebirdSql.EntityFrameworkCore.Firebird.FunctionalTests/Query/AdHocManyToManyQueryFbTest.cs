@@ -16,13 +16,12 @@
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
 using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.EntityFrameworkCore.TestUtilities;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class AdHocManyToManyQueryFbTest(NonSharedFixture fixture) : AdHocManyToManyQueryRelationalTestBase(fixture)
+public class AdHocManyToManyQueryFbTest : AdHocManyToManyQueryRelationalTestBase
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 }

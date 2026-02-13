@@ -352,7 +352,9 @@ internal sealed class DbValue
 	{
 		return _value switch
 		{
+#if NET6_0_OR_GREATER
 			DateOnly @do => TypeEncoder.EncodeDate(@do),
+#endif
 			_ => TypeEncoder.EncodeDate(GetDateTime()),
 		};
 	}
@@ -363,7 +365,9 @@ internal sealed class DbValue
 		{
 			TimeSpan ts => TypeEncoder.EncodeTime(ts),
 			FbZonedTime zt => TypeEncoder.EncodeTime(zt.Time),
+#if NET6_0_OR_GREATER
 			TimeOnly to => TypeEncoder.EncodeTime(to),
+#endif
 			_ => TypeEncoder.EncodeTime(TypeHelper.DateTimeTimeToTimeSpan(GetDateTime())),
 		};
 	}
@@ -424,7 +428,7 @@ internal sealed class DbValue
 					else
 					{
 						var svalue = GetString();
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesEx().Count() > Field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -460,7 +464,7 @@ internal sealed class DbValue
 					else
 					{
 						var svalue = GetString();
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesEx().Count() > Field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -639,7 +643,7 @@ internal sealed class DbValue
 					else
 					{
 						var svalue = await GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesEx().Count() > Field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -675,7 +679,7 @@ internal sealed class DbValue
 					else
 					{
 						var svalue = await GetStringAsync(cancellationToken).ConfigureAwait(false);
-						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesToChars().Count() > Field.CharCount)
+						if ((Field.Length % Field.Charset.BytesPerCharacter) == 0 && svalue.EnumerateRunesEx().Count() > Field.CharCount)
 						{
 							throw IscException.ForErrorCodes(new[] { IscCodes.isc_arith_except, IscCodes.isc_string_truncation });
 						}
@@ -875,7 +879,7 @@ internal sealed class DbValue
 	private ValueTask<BlobStream> GetBlobStreamAsync(long blobId, CancellationToken cancellationToken = default)
 	{
 		var blob = _statement.CreateBlob(blobId);
-		return ValueTask.FromResult(new BlobStream(blob));
+		return ValueTask2.FromResult(new BlobStream(blob));
 	}
 
 	private Array GetArrayData(long handle)

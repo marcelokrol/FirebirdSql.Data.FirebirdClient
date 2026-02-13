@@ -23,14 +23,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
-using Microsoft.Extensions.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
 [DefaultEvent("InfoMessage")]
 public sealed class FbConnection : DbConnection, ICloneable
 {
-	static readonly ILogger<FbConnection> Log = FbLogManager.CreateLogger<FbConnection>();
+	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbConnection));
 
 	#region Static Pool Handling Methods
 
@@ -316,6 +315,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 		}
 		base.Dispose(disposing);
 	}
+#if !(NET48 || NETSTANDARD2_0)
 	public override async ValueTask DisposeAsync()
 	{
 		if (!_disposed)
@@ -326,6 +326,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 		}
 		await base.DisposeAsync().ConfigureAwait(false);
 	}
+#endif
 
 	#endregion
 
@@ -341,11 +342,19 @@ public sealed class FbConnection : DbConnection, ICloneable
 	#region Transaction Handling Methods
 
 	public new FbTransaction BeginTransaction() => BeginTransaction(FbTransaction.DefaultIsolationLevel, null);
+#if NET48 || NETSTANDARD2_0
+	public Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+#else
 	public new Task<FbTransaction> BeginTransactionAsync(CancellationToken cancellationToken = default)
+#endif
 			=> BeginTransactionAsync(FbTransaction.DefaultIsolationLevel, null, cancellationToken);
 
 	public new FbTransaction BeginTransaction(IsolationLevel level) => BeginTransaction(level, null);
+#if NET48 || NETSTANDARD2_0
+	public Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+#else
 	public new Task<FbTransaction> BeginTransactionAsync(IsolationLevel level, CancellationToken cancellationToken = default)
+#endif
 			=> BeginTransactionAsync(level, null, cancellationToken);
 
 	public FbTransaction BeginTransaction(string transactionName) => BeginTransaction(FbTransaction.DefaultIsolationLevel, transactionName);
@@ -381,7 +390,9 @@ public sealed class FbConnection : DbConnection, ICloneable
 	}
 
 	protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel) => BeginTransaction(isolationLevel);
+#if !(NET48 || NETSTANDARD2_0)
 	protected override async ValueTask<DbTransaction> BeginDbTransactionAsync(IsolationLevel isolationLevel, CancellationToken cancellationToken) => await BeginTransactionAsync(isolationLevel, cancellationToken).ConfigureAwait(false);
+#endif
 
 	#endregion
 
@@ -405,7 +416,11 @@ public sealed class FbConnection : DbConnection, ICloneable
 	{
 		return GetSchema("MetaDataCollections");
 	}
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public Task<DataTable> GetSchemaAsync(CancellationToken cancellationToken = default)
+#else
 	public override Task<DataTable> GetSchemaAsync(CancellationToken cancellationToken = default)
+#endif
 	{
 		return GetSchemaAsync("MetaDataCollections", cancellationToken);
 	}
@@ -414,7 +429,11 @@ public sealed class FbConnection : DbConnection, ICloneable
 	{
 		return GetSchema(collectionName, null);
 	}
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public Task<DataTable> GetSchemaAsync(string collectionName, CancellationToken cancellationToken = default)
+#else
 	public override Task<DataTable> GetSchemaAsync(string collectionName, CancellationToken cancellationToken = default)
+#endif
 	{
 		return GetSchemaAsync(collectionName, null, cancellationToken);
 	}
@@ -424,7 +443,11 @@ public sealed class FbConnection : DbConnection, ICloneable
 
 		return _innerConnection.GetSchema(collectionName, restrictions);
 	}
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public Task<DataTable> GetSchemaAsync(string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
+#else
 	public override Task<DataTable> GetSchemaAsync(string collectionName, string[] restrictions, CancellationToken cancellationToken = default)
+#endif
 	{
 		CheckClosed();
 
@@ -445,6 +468,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 		return new FbCommand(null, this);
 	}
 
+#if NET6_0_OR_GREATER
 	public new DbBatch CreateBatch()
 	{
 		throw new NotSupportedException("DbBatch is currently not supported. Use FbBatchCommand instead.");
@@ -454,6 +478,7 @@ public sealed class FbConnection : DbConnection, ICloneable
 	{
 		return CreateBatch();
 	}
+#endif
 
 	public FbBatchCommand CreateBatchCommand()
 	{
@@ -490,7 +515,11 @@ public sealed class FbConnection : DbConnection, ICloneable
 			throw FbException.Create(ex);
 		}
 	}
+#if NET48 || NETSTANDARD2_0
+	public async Task ChangeDatabaseAsync(string databaseName, CancellationToken cancellationToken = default)
+#else
 	public override async Task ChangeDatabaseAsync(string databaseName, CancellationToken cancellationToken = default)
+#endif
 	{
 		CheckClosed();
 
@@ -771,7 +800,11 @@ public sealed class FbConnection : DbConnection, ICloneable
 			_innerConnection = null;
 		}
 	}
+#if NET48 || NETSTANDARD2_0
+	public async Task CloseAsync()
+#else
 	public override async Task CloseAsync()
+#endif
 	{
 		LogMessages.ConnectionClosing(Log, this);
 

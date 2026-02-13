@@ -57,10 +57,12 @@ internal static class TypeEncoder
 	{
 		return (int)(t.Ticks / 1000L);
 	}
+#if NET6_0_OR_GREATER
 	public static int EncodeTime(TimeOnly t)
 	{
 		return (int)(t.Ticks / 1000L);
 	}
+#endif
 
 	public static int EncodeDate(DateTime d)
 	{
@@ -70,10 +72,12 @@ internal static class TypeEncoder
 		var year = calendar.GetYear(d);
 		return EncodeDateImpl(year, month, day);
 	}
+#if NET6_0_OR_GREATER
 	public static int EncodeDate(DateOnly d)
 	{
 		return EncodeDateImpl(d.Year, d.Month, d.Day);
 	}
+#endif
 	static int EncodeDateImpl(int year, int month, int day)
 	{
 		if (month > 2)

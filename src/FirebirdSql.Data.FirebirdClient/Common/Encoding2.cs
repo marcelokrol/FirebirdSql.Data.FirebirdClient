@@ -13,19 +13,31 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Niek Schoemaker (@niekschoemaker)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.EntityFrameworkCore.Query.Translations;
-using Xunit.Abstractions;
+using System;
+using System.Globalization;
+using System.Text;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Translations;
+namespace FirebirdSql.Data.Common;
 
-public class GuidTranslationsFbTest : GuidTranslationsTestBase<BasicTypesQueryFbFixture>
+internal static class Encoding2
 {
-	public GuidTranslationsFbTest(BasicTypesQueryFbFixture fixture, ITestOutputHelper testOutputHelper)
-		: base(fixture)
+	public static Encoding Default { get; } = GetANSIEncoding();
+
+	private static Encoding GetANSIEncoding()
 	{
-		Fixture.TestSqlLoggerFactory.Clear();
-		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
+#if NET48
+		return Encoding.Default;
+#else
+		try
+		{
+			return Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.ANSICodePage);
+		}
+		catch (Exception)
+		{
+			return Encoding.Default;
+		}
+#endif
 	}
 }

@@ -159,7 +159,7 @@ internal class GdsDatabase : DatabaseBase
 	protected virtual ValueTask ProcessAttachResponseAsync(GenericResponse response, CancellationToken cancellationToken = default)
 	{
 		_handle = response.ObjectHandle;
-		return ValueTask.CompletedTask;
+		return ValueTask2.CompletedTask;
 	}
 
 	protected void AfterAttachActions()
@@ -353,7 +353,7 @@ internal class GdsDatabase : DatabaseBase
 	protected ValueTask ProcessCreateResponseAsync(GenericResponse response, CancellationToken cancellationToken = default)
 	{
 		_handle = response.ObjectHandle;
-		return ValueTask.CompletedTask;
+		return ValueTask2.CompletedTask;
 	}
 
 	public override void CreateDatabaseWithTrustedAuth(DatabaseParameterBufferBase dpb, string database, byte[] cryptKey)
@@ -784,7 +784,7 @@ internal class GdsDatabase : DatabaseBase
 	{ }
 	protected virtual ValueTask ProcessReleaseObjectResponseAsync(IResponse response, CancellationToken cancellationToken = default)
 	{
-		return ValueTask.CompletedTask;
+		return ValueTask2.CompletedTask;
 	}
 
 	#endregion

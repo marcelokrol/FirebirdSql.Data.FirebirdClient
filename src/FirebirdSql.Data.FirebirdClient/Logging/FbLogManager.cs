@@ -15,23 +15,37 @@
 
 //$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Logging;
+using System;
 
 namespace FirebirdSql.Data.Logging;
 
 public static class FbLogManager
 {
-	public static bool IsParameterLoggingEnabled { get; private set; } = false;
+	public static IFbLoggingProvider Provider
+	{
+		get
+		{
+			_providerRetrieved = true;
+			return _provider;
+		}
+		set
+		{
+			if (_providerRetrieved)
+				throw new InvalidOperationException("The logging provider must be set before any action is taken");
 
-	private static ILoggerFactory LoggerFactory = NullLoggerFactory.Instance;
+			_provider = value ?? throw new ArgumentNullException(nameof(value));
+		}
+	}
 
-	public static void UseLoggerFactory(ILoggerFactory loggerFactory) =>
-		LoggerFactory = loggerFactory;
+	public static bool IsParameterLoggingEnabled { get; set; }
 
-	public static void EnableParameterLogging(bool enable = true) =>
-		IsParameterLoggingEnabled = enable;
+	static IFbLoggingProvider _provider;
+	static bool _providerRetrieved;
 
-	internal static ILogger<T> CreateLogger<T>() =>
-		LoggerFactory.CreateLogger<T>();
+	static FbLogManager()
+	{
+		_provider = new NullLoggingProvider();
+	}
+
+	internal static IFbLogger CreateLogger(string name) => Provider.CreateLogger("FirebirdClient." + name);
 }

@@ -1,13 +1,13 @@
 <Project>
 	<!-- Provider -->
 	<PropertyGroup>
-		<ProviderVersion>11.0.0-alpha1</ProviderVersion>
+		<ProviderVersion>10.3.4</ProviderVersion>
 	</PropertyGroup>
 	<!-- EFCore -->
 	<PropertyGroup>
-		<EFCoreProviderVersion>13.0.0</EFCoreProviderVersion>
-		<EFCoreReferenceProviderVersion>10.3.4</EFCoreReferenceProviderVersion>
-		<EFCoreReferencePackageVersion>10.0.0</EFCoreReferencePackageVersion>
+		<EFCoreProviderVersion>12.0.0</EFCoreProviderVersion>
+		<EFCoreReferenceProviderVersion>10.3.2</EFCoreReferenceProviderVersion>
+		<EFCoreReferencePackageVersion>9.0.1</EFCoreReferencePackageVersion>
 	</PropertyGroup>
 	<!-- EF6 -->
 	<PropertyGroup>

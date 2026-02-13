@@ -60,7 +60,7 @@ internal abstract class TransactionBase
 	{ }
 	public virtual ValueTask Dispose2Async(CancellationToken cancellationToken = default)
 	{
-		return ValueTask.CompletedTask;
+		return ValueTask2.CompletedTask;
 	}
 
 	protected void EnsureActiveTransactionState()

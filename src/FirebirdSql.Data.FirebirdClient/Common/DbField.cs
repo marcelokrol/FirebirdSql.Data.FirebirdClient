@@ -326,7 +326,7 @@ internal sealed class DbField
 						{
 							var s = Charset.GetString(buffer, 0, buffer.Length);
 
-							var runes = s.EnumerateRunesToChars().ToList();
+							var runes = s.EnumerateRunesEx().ToList();
 							if ((Length % Charset.BytesPerCharacter) == 0 &&
 								runes.Count > CharCount)
 							{
@@ -511,7 +511,7 @@ internal sealed class DbField
 
 				case DbDataType.Date:
 				case DbDataType.TimeStamp:
-					DbValue.SetValue(DateTime.UnixEpoch);
+					DbValue.SetValue(DateTime2.UnixEpoch);
 					break;
 
 				case DbDataType.Time:
@@ -524,7 +524,7 @@ internal sealed class DbField
 
 				case DbDataType.TimeStampTZ:
 				case DbDataType.TimeStampTZEx:
-					DbValue.SetValue(new FbZonedDateTime(DateTime.UnixEpoch, TimeZoneMapping.DefaultTimeZoneName));
+					DbValue.SetValue(new FbZonedDateTime(DateTime2.UnixEpoch, TimeZoneMapping.DefaultTimeZoneName));
 					break;
 
 				case DbDataType.TimeTZ:

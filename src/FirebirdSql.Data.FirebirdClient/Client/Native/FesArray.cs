@@ -134,7 +134,7 @@ internal sealed class FesArray : ArrayBase
 
 		_database.ProcessStatusVector(_statusVector);
 
-		return ValueTask.FromResult(buffer);
+		return ValueTask2.FromResult(buffer);
 	}
 
 	public override void PutSlice(Array sourceArray, int sliceLength)
@@ -205,7 +205,7 @@ internal sealed class FesArray : ArrayBase
 
 		_database.ProcessStatusVector(_statusVector);
 
-		return ValueTask.CompletedTask;
+		return ValueTask2.CompletedTask;
 	}
 
 	#endregion
@@ -520,7 +520,7 @@ internal sealed class FesArray : ArrayBase
 			sliceData = tempData;
 		}
 
-		return ValueTask.FromResult(sliceData);
+		return ValueTask2.FromResult(sliceData);
 	}
 
 	#endregion

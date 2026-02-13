@@ -13,16 +13,16 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Niek Schoemaker (@niekschoemaker)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.TestUtilities;
-using Microsoft.EntityFrameworkCore.Query.Associations.ComplexTableSplitting;
-using Microsoft.EntityFrameworkCore.TestUtilities;
+namespace FirebirdSql.Data.Logging;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.ComplexTableSplitting;
-
-public class ComplexTableSplittingFbFixture : ComplexTableSplittingRelationalFixtureBase
+public enum FbLogLevel
 {
-	protected override ITestStoreFactory TestStoreFactory
-		=> FbTestStoreFactory.Instance;
+	Trace = 1,
+	Debug = 2,
+	Info = 3,
+	Warn = 4,
+	Error = 5,
+	Fatal = 6,
 }

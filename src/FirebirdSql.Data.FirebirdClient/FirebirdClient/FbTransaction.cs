@@ -22,13 +22,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using FirebirdSql.Data.Common;
 using FirebirdSql.Data.Logging;
-using Microsoft.Extensions.Logging;
 
 namespace FirebirdSql.Data.FirebirdClient;
 
 public sealed class FbTransaction : DbTransaction
 {
-	static readonly ILogger<FbTransaction> Log = FbLogManager.CreateLogger<FbTransaction>();
+	static readonly IFbLogger Log = FbLogManager.CreateLogger(nameof(FbTransaction));
 
 	internal const IsolationLevel DefaultIsolationLevel = IsolationLevel.ReadCommitted;
 
@@ -65,10 +64,12 @@ public sealed class FbTransaction : DbTransaction
 		get { return _connection; }
 	}
 
+#if !(NET48 || NETSTANDARD2_0 || NETSTANDARD2_1)
 	public override bool SupportsSavepoints
 	{
 		get { return true; }
 	}
+#endif
 
 	#endregion
 
@@ -113,6 +114,7 @@ public sealed class FbTransaction : DbTransaction
 		}
 		base.Dispose(disposing);
 	}
+#if !(NET48 || NETSTANDARD2_0)
 	public override async ValueTask DisposeAsync()
 	{
 		if (!_disposed)
@@ -138,6 +140,7 @@ public sealed class FbTransaction : DbTransaction
 		}
 		await base.DisposeAsync().ConfigureAwait(false);
 	}
+#endif
 
 	#endregion
 
@@ -160,7 +163,11 @@ public sealed class FbTransaction : DbTransaction
 
 		LogMessages.TransactionCommitted(Log, this);
 	}
+#if NET48 || NETSTANDARD2_0
+	public async Task CommitAsync(CancellationToken cancellationToken = default)
+#else
 	public override async Task CommitAsync(CancellationToken cancellationToken = default)
+#endif
 	{
 		LogMessages.TransactionCommitting(Log, this);
 
@@ -195,7 +202,11 @@ public sealed class FbTransaction : DbTransaction
 
 		LogMessages.TransactionRolledBack(Log, this);
 	}
+#if NET48 || NETSTANDARD2_0
+	public async Task RollbackAsync(CancellationToken cancellationToken = default)
+#else
 	public override async Task RollbackAsync(CancellationToken cancellationToken = default)
+#endif
 	{
 		LogMessages.TransactionRollingBack(Log, this);
 
@@ -213,7 +224,11 @@ public sealed class FbTransaction : DbTransaction
 		LogMessages.TransactionRolledBack(Log, this);
 	}
 
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public void Save(string savePointName)
+#else
 	public override void Save(string savePointName)
+#endif
 	{
 		LogMessages.TransactionSaving(Log, this);
 
@@ -222,7 +237,11 @@ public sealed class FbTransaction : DbTransaction
 		try
 		{
 			var command = new FbCommand($"SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
 			using (command)
+#else
+			using (command)
+#endif
 			{
 				command.ExecuteNonQuery();
 			}
@@ -234,7 +253,11 @@ public sealed class FbTransaction : DbTransaction
 
 		LogMessages.TransactionSaved(Log, this);
 	}
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public async Task SaveAsync(string savePointName, CancellationToken cancellationToken = default)
+#else
 	public override async Task SaveAsync(string savePointName, CancellationToken cancellationToken = default)
+#endif
 	{
 		LogMessages.TransactionSaving(Log, this);
 
@@ -243,7 +266,11 @@ public sealed class FbTransaction : DbTransaction
 		try
 		{
 			var command = new FbCommand($"SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
+			using (command)
+#else
 			await using (command.ConfigureAwait(false))
+#endif
 			{
 				await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 			}
@@ -256,7 +283,11 @@ public sealed class FbTransaction : DbTransaction
 		LogMessages.TransactionSaved(Log, this);
 	}
 
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public void Release(string savePointName)
+#else
 	public override void Release(string savePointName)
+#endif
 	{
 		LogMessages.TransactionReleasingSavepoint(Log, this);
 
@@ -265,7 +296,11 @@ public sealed class FbTransaction : DbTransaction
 		try
 		{
 			var command = new FbCommand($"RELEASE SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
 			using (command)
+#else
+			using (command)
+#endif
 			{
 				command.ExecuteNonQuery();
 			}
@@ -277,7 +312,11 @@ public sealed class FbTransaction : DbTransaction
 
 		LogMessages.TransactionReleasedSavepoint(Log, this);
 	}
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public async Task ReleaseAsync(string savePointName, CancellationToken cancellationToken = default)
+#else
 	public override async Task ReleaseAsync(string savePointName, CancellationToken cancellationToken = default)
+#endif
 	{
 		LogMessages.TransactionReleasingSavepoint(Log, this);
 
@@ -286,7 +325,11 @@ public sealed class FbTransaction : DbTransaction
 		try
 		{
 			var command = new FbCommand($"RELEASE SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
+			using (command)
+#else
 			await using (command.ConfigureAwait(false))
+#endif
 			{
 				await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 			}
@@ -299,7 +342,11 @@ public sealed class FbTransaction : DbTransaction
 		LogMessages.TransactionReleasedSavepoint(Log, this);
 	}
 
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public void Rollback(string savePointName)
+#else
 	public override void Rollback(string savePointName)
+#endif
 	{
 		LogMessages.TransactionRollingBackSavepoint(Log, this);
 
@@ -308,7 +355,11 @@ public sealed class FbTransaction : DbTransaction
 		try
 		{
 			var command = new FbCommand($"ROLLBACK WORK TO SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
 			using (command)
+#else
+			using (command)
+#endif
 			{
 				command.ExecuteNonQuery();
 			}
@@ -320,7 +371,11 @@ public sealed class FbTransaction : DbTransaction
 
 		LogMessages.TransactionRolledBackSavepoint(Log, this);
 	}
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+	public async Task RollbackAsync(string savePointName, CancellationToken cancellationToken = default)
+#else
 	public override async Task RollbackAsync(string savePointName, CancellationToken cancellationToken = default)
+#endif
 	{
 		LogMessages.TransactionRollingBackSavepoint(Log, this);
 
@@ -329,7 +384,11 @@ public sealed class FbTransaction : DbTransaction
 		try
 		{
 			var command = new FbCommand($"ROLLBACK WORK TO SAVEPOINT {savePointName}", _connection, this);
+#if NET48 || NETSTANDARD2_0
+			using (command)
+#else
 			await using (command.ConfigureAwait(false))
+#endif
 			{
 				await command.ExecuteNonQueryAsync(cancellationToken).ConfigureAwait(false);
 			}

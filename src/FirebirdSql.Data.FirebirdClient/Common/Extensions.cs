@@ -17,89 +17,82 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Net.Sockets;
 
 namespace FirebirdSql.Data.Common;
 
 internal static class Extensions
 {
-	extension(IntPtr ptr)
+	public static int AsInt(this IntPtr ptr)
 	{
-		public int AsInt()
+		return (int)ptr.ToInt64();
+	}
+
+	public static IntPtr ReadIntPtr(this BinaryReader self)
+	{
+		if (IntPtr.Size == sizeof(int))
 		{
-			return (int)ptr.ToInt64();
+			return new IntPtr(self.ReadInt32());
+		}
+		else if (IntPtr.Size == sizeof(long))
+		{
+			return new IntPtr(self.ReadInt64());
+		}
+		else
+		{
+			throw new NotSupportedException();
 		}
 	}
 
-	extension(BinaryReader binaryReader)
+	public static string ToHexString(this byte[] b)
 	{
-		public IntPtr ReadIntPtr()
+#if NET5_0_OR_GREATER
+		return Convert.ToHexString(b);
+#else
+		return BitConverter.ToString(b).Replace("-", string.Empty);
+#endif
+	}
+
+	public static IEnumerable<IEnumerable<T>> Split<T>(this T[] array, int size)
+	{
+		for (var i = 0; i < (float)array.Length / size; i++)
 		{
-			if (IntPtr.Size == sizeof(int))
+			yield return array.Skip(i * size).Take(size);
+		}
+	}
+
+#if NETSTANDARD2_0
+	public static HashSet<T> ToHashSet<T>(this IEnumerable<T> source) => new HashSet<T>(source);
+#endif
+
+	public static IEnumerable<char[]> EnumerateRunesEx(this string s)
+	{
+		if (s == null)
+			throw new ArgumentNullException(nameof(s));
+
+#if NETSTANDARD2_0 || NETSTANDARD2_1 || NET48
+		for (var i = 0; i < s.Length; i++)
+		{
+			if (char.IsHighSurrogate(s[i]) && i + 1 < s.Length && char.IsLowSurrogate(s[i + 1]))
 			{
-				return new IntPtr(binaryReader.ReadInt32());
-			}
-			else if (IntPtr.Size == sizeof(long))
-			{
-				return new IntPtr(binaryReader.ReadInt64());
+				yield return new[] { s[i], s[i + 1] };
+				i++;
 			}
 			else
 			{
-				throw new NotSupportedException();
+				yield return new[] { s[i] };
 			}
 		}
-	}
 
-	extension(byte[] b)
-	{
-		public string ToHexString()
+#else
+		return s.EnumerateRunes().Select(r =>
 		{
-			return Convert.ToHexString(b);
-		}
-	}
-
-	extension<T>(T[] array)
-	{
-		public IEnumerable<IEnumerable<T>> Split(int size)
-		{
-			for (var i = 0; i < (float)array.Length / size; i++)
-			{
-				yield return array.Skip(i * size).Take(size);
-			}
-		}
-	}
-
-	extension(string s)
-	{
-		public IEnumerable<char[]> EnumerateRunesToChars()
-		{
-			if (s == null)
-				throw new ArgumentNullException(nameof(s));
-
-			return s.EnumerateRunes().Select(r =>
-			{
-				var result = new char[r.Utf16SequenceLength];
-				r.EncodeToUtf16(result);
-				return result;
-			});
-		}
-	}
-
-	extension(Encoding)
-	{
-		public static Encoding GetANSIEncoding()
-		{
-			try
-			{
-				return Encoding.GetEncoding(CultureInfo.CurrentCulture.TextInfo.ANSICodePage);
-			}
-			catch (Exception)
-			{
-				return Encoding.Default;
-			}
-		}
+			var result = new char[r.Utf16SequenceLength];
+			r.EncodeToUtf16(result);
+			return result;
+		});
+#endif
 	}
 }

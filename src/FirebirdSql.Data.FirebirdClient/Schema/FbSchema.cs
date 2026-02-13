@@ -57,7 +57,11 @@ internal abstract class FbSchema
 		}
 		finally
 		{
+#if NET48 || NETSTANDARD2_0
 			command.Dispose();
+#else
+			command.Dispose();
+#endif
 		}
 		TrimStringFields(dataTable);
 		ProcessResult(dataTable);
@@ -83,7 +87,12 @@ internal abstract class FbSchema
 		}
 		finally
 		{
+#if NET48 || NETSTANDARD2_0
+			command.Dispose();
+			await Task.CompletedTask.ConfigureAwait(false);
+#else
 			await command.DisposeAsync().ConfigureAwait(false);
+#endif
 		}
 		TrimStringFields(dataTable);
 		ProcessResult(dataTable);

@@ -113,7 +113,7 @@ internal class GdsServiceManager : ServiceManagerBase
 	protected virtual ValueTask ProcessAttachResponseAsync(GenericResponse response, CancellationToken cancellationToken = default)
 	{
 		Handle = response.ObjectHandle;
-		return ValueTask.CompletedTask;
+		return ValueTask2.CompletedTask;
 	}
 
 	public override void Detach()

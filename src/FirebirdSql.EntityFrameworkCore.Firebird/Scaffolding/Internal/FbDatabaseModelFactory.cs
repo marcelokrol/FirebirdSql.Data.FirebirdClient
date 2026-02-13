@@ -121,9 +121,9 @@ public class FbDatabaseModelFactory : DatabaseModelFactory
 					var comment = reader.GetString(1);
 					var type = reader.GetInt32(2);
 
-					var table = type == 1
-						? new DatabaseView()
-						: new DatabaseTable();
+					var table = type == 0
+						? new DatabaseTable()
+						: new DatabaseView();
 
 					table.Schema = null;
 					table.Name = name;

@@ -13,18 +13,25 @@
  *    All Rights Reserved.
  */
 
-//$Authors = Niek Schoemaker (@niekschoemaker)
+//$Authors = Jiri Cincura (jiri@cincura.net)
 
-using Microsoft.EntityFrameworkCore.Query.Associations.Navigations;
-using Xunit.Abstractions;
+using System.Threading.Tasks;
 
-namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query.Associations.Navigations;
+namespace FirebirdSql.Data.Common;
 
-public class NavigationsIncludeFbTest : NavigationsIncludeRelationalTestBase<NavigationsFbFixture>
+internal static class ValueTask2
 {
-	public NavigationsIncludeFbTest(NavigationsFbFixture fixture, ITestOutputHelper testOutputHelper) : base(fixture, testOutputHelper)
-	{
-		Fixture.TestSqlLoggerFactory.Clear();
-		Fixture.TestSqlLoggerFactory.SetTestOutputHelper(testOutputHelper);
-	}
+	public static ValueTask<TResult> FromResult<TResult>(TResult result) =>
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+			new ValueTask<TResult>(result);
+#else
+			ValueTask.FromResult(result);
+#endif
+
+	public static ValueTask CompletedTask =>
+#if NET48 || NETSTANDARD2_0 || NETSTANDARD2_1
+			default;
+#else
+			ValueTask.CompletedTask;
+#endif
 }

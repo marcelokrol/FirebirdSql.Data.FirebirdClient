@@ -26,7 +26,6 @@
 * [Downloads](https://github.com/FirebirdSQL/NETProvider/releases)
 * [Issue tracker](https://github.com/FirebirdSQL/NETProvider/issues)
 * [Development mailing list](https://groups.google.com/forum/#!forum/firebird-net-provider)
-* [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/FirebirdSQL/NETProvider)
 
 ## Builds
 

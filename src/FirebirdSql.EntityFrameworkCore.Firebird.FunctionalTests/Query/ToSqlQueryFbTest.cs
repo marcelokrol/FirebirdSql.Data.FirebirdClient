@@ -25,7 +25,7 @@ using Xunit;
 
 namespace FirebirdSql.EntityFrameworkCore.Firebird.FunctionalTests.Query;
 
-public class ToSqlQueryFbTest(NonSharedFixture fixture) : ToSqlQueryTestBase(fixture)
+public class ToSqlQueryFbTest : ToSqlQueryTestBase
 {
 	protected override ITestStoreFactory TestStoreFactory => FbTestStoreFactory.Instance;
 
