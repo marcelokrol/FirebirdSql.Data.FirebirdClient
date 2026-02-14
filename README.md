@@ -1,5 +1,11 @@
 # Firebird .NET Data Provider
 
+**Observações**  
+
+> Fiz esse fork pois nas versões mais recentes tive um problema de compatibilidade com o Net Framework 4.8. Então resolvi voltar algumas versões pra trás e atualizei alguns pacotes para manter a compatibilidade com o nosso projeto.
+
+>> **Resumindo**: Se for baixar e usar esse aqui e não o oficial, use por sua conta e risco, _não dou suporte_.
+
 ## Documentation
 
 * [ADO.NET provider](docs/ado-net.md)
